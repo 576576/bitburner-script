@@ -3,7 +3,7 @@ const logo = `
 ██╔════╝██║ ██╔╝╚██╗ ██╔╝     ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║
 ███████╗█████╔╝  ╚████╔╝█████╗███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║
 ╚════██║██╔═██╗   ╚██╔╝ ╚════╝╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║
-███████║██║  ██╗   ██║        ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║
+███████║██║  ██╗   ██║        ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║(改)
 ╚══════╝╚═╝  ╚═╝   ╚═╝        ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝
 `;
 
@@ -11,7 +11,7 @@ const logo = `
 const setupConfig = {
   // 代码源地址
   github:
-    "https://raw.githubusercontent.com/LtyFantasy/bitburner-script/main/src",
+    "https://raw.githubusercontent.com/576576/bitburner-script/main/src",
   // 模块配置，后续在这里追加其他模块配置
   modules: [
     {
@@ -25,10 +25,10 @@ const setupConfig = {
       name: 'Hack模块',
       folder: "hack",
       files: [
-        // 普通串行Hack脚本
+        "scan-deploy-silent.js",
         "normal-hack.js",
-        // 动态Hack系列脚本
         "analyze-hack.js",
+        "analyze-hack-silent.js",
         "hack-loop.js",
         "do-hack.js",
         "do-grow.js",
@@ -40,14 +40,25 @@ const setupConfig = {
       name: "工具集",
       folder: "tools",
       files: [
+        "deploy-auto.js",
+        "hacknet-node-auto.js"
+      ]
+    },
+    {
+      enable: true,
+      name: "根快捷工具",
+      folder: "",
+      files: [
         // 购买服务器
         "buy-server.js",
         // 快速执行动态Hack
         "run-analyze-hack.js",
-        // 扫描并批量部署Normal Hack
-        "scan-deploy-normal-hack.js"
+        // 扫描并批量部署Hack
+        "scan-deploy.js",
+        // 扫描并列表输出
+        "scan-list.js",
       ]
-    },
+    }
   ],
 };
 
@@ -56,7 +67,7 @@ export async function main(ns) {
 
   const log = createLogger(ns, "巡天系统");
   if (ns.getHostname() !== 'home') {
-    throw "⚠ 脚本只能从home执行";
+    ns.tprint("\x1b[31m请确保系列脚本在home上存在, 或修改脚本");
   }
 
   const success = await downloadFiles(ns);
@@ -66,8 +77,7 @@ export async function main(ns) {
   }
 
   log(logo);
-  log("巡天系统安装完毕，欢迎使用本系列脚本~");
-  log("未来，完整版巡天系统会附带UI操作界面，敬请期待");
+  log("巡天系统(改)安装完毕，欢迎使用本系列脚本~");
 }
 
 /**
@@ -98,12 +108,12 @@ async function downloadFiles(ns) {
 
   log(`总计${list.length}个文件需要下载`);
   do {
-    retry > 0 && log(`下载重试，第${retry+1}次`);
+    retry > 0 && log(`下载重试，第${retry + 1}次`);
     for (const file of list) {
 
       if (file.success) continue;
 
-      log(`开始下载模块(${file.module})，下属文件(${file.path})，[${count+1} / ${list.length}]`);
+      log(`开始下载模块(${file.module})，下属文件(${file.path})，[${count + 1} / ${list.length}]`);
       const success = await ns.wget(file.url, file.path);
       if (success) {
         log(`😁 文件${file.path}下载成功`);
@@ -120,7 +130,7 @@ async function downloadFiles(ns) {
     // 重试仍然失败
     if (++retry >= 3) break;
     await ns.sleep(1000);
-  } while(count != list.length);
+  } while (count != list.length);
 
   return count === list.length;
 }
