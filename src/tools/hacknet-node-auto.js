@@ -5,7 +5,7 @@
  */
 const paybackTime = 3600;
 const milestone = 5.2e9;
-const delay = 1000, retryTime = 1.2e4;
+const delay = 1000, retryTime = 1.2e6;
 
 async function hacknetAuto(ns) {
   while (true) {
@@ -93,6 +93,7 @@ export async function main(ns) {
     await ns.sleep(400);
     ns.tprint("尝试初始化 node-0");
     ns.hacknet.purchaseNode();
+    numNodes = ns.hacknet.numNodes();
   }
   await hacknetAuto(ns);
 }
